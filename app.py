@@ -5,10 +5,10 @@ app = Flask(__name__)
 
 # MySQL connection details
 db = mysql.connector.connect(
-    host="localhost",
-    user="your_user",
-    password="your_password",
-    database="your_db"
+    host="http://181.215.246.169:3306/",
+    user="root",
+    password="root",
+    database="CCSD"
 )
 
 @app.route('/login', methods=['POST'])
