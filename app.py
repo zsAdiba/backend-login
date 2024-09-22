@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # MySQL connection details using host.docker.internal and specifying the port
 db = mysql.connector.connect(
-    host="127.0.0.1",  # Use host.docker.internal to access the host machine
+    host="181.215.246.169",  # Use host.docker.internal to access the host machine
     user="root",
     password="root",
     database="CCSD",
@@ -27,5 +27,5 @@ def login():
     else:
         return jsonify({"message": "Invalid credentials!"}), 401
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=80, debug=True)
