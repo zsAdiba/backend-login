@@ -3,12 +3,13 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# MySQL connection details
+# MySQL connection details using host.docker.internal and specifying the port
 db = mysql.connector.connect(
-    host="http://181.215.246.169:3306/",
+    host="127.0.0.1",  # Use host.docker.internal to access the host machine
     user="root",
     password="root",
-    database="CCSD"
+    database="CCSD",
+    port=3306  # Explicitly specifying the MySQL port
 )
 
 @app.route('/login', methods=['POST'])
@@ -17,7 +18,7 @@ def login():
     password = request.json['password']
     
     cursor = db.cursor(dictionary=True)
-    query = "SELECT * FROM users WHERE username = %s AND password = %s"
+    query = "SELECT * FROM user WHERE userName = %s AND Password = %s"
     cursor.execute(query, (username, password))
     user = cursor.fetchone()
 
