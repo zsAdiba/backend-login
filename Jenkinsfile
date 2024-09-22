@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.9'  // Use the Python image for the pipeline
+            image 'python:3.9-slim'  // Use the Python Docker image for the pipeline
             args '-v jenkins_home:/var/lib/docker/volumes/jenkins_home/_data'
         }
     }
