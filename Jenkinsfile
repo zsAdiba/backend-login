@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         APP_NAME = 'flask-login-app'
-        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}' // Replace with your Docker Hub username or appropriate image name
+        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
         DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
     }
 
@@ -23,8 +23,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install Python dependencies from requirements.txt
-                    sh 'pip install -r requirements.txt'
+                    // Install Python dependencies with user permissions
+                    sh 'pip install --user -r requirements.txt'
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
                     '''
                 }
             }
