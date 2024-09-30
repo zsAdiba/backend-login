@@ -20,11 +20,26 @@ pipeline {
             }
         }
 
+        stage('Set up Virtual Environment') {
+            steps {
+                script {
+                    // Create a virtual environment and activate it
+                    sh '''
+                    python -m venv venv
+                    . venv/bin/activate
+                    '''
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Install Python dependencies with user permissions
-                    sh 'pip install --user -r requirements.txt'
+                    // Install Python dependencies from requirements.txt
+                    sh '''
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
                 }
             }
         }
