@@ -10,6 +10,7 @@ pipeline {
         APP_NAME = 'flask-login-app'
         IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
         DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
+        DOCKER_CONFIG = '/root/.docker'  // Use a writable directory for Docker config
     }
 
     stages {
@@ -49,6 +50,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build the Docker image using the writable Docker config directory
                     sh '''
                     docker build -t ${IMAGE_NAME}:latest .
                     '''
