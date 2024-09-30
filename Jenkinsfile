@@ -8,18 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Install sudo') {
-            steps {
-                script {
-                    // Install sudo on the agent
-                    sh '''
-                    apt-get update
-                    apt-get install -y sudo
-                    '''
-                }
-            }
-        }
-
         stage('Clone Repository') {
             steps {
                 // Clone the Git repository from the remote URL
@@ -39,7 +27,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // This step can be customized if you have unit tests for your Python app
+                    // Placeholder for tests
                     echo 'Tests passed!'
                 }
             }
@@ -48,9 +36,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image with sudo
+                    // Build the Docker image
                     sh '''
-                    sudo docker build -t ${IMAGE_NAME}:latest .
+                    docker build -t ${IMAGE_NAME}:latest .
                     '''
                 }
             }
@@ -61,16 +49,16 @@ pipeline {
                 script {
                     // Stop and remove existing container if it exists
                     sh '''
-                    if [ "$(sudo docker ps -q -f name=${APP_NAME})" ]; then
+                    if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
                         echo "Stopping existing container ${APP_NAME}..."
-                        sudo docker stop ${APP_NAME}
+                        docker stop ${APP_NAME}
                         echo "Removing existing container ${APP_NAME}..."
-                        sudo docker rm ${APP_NAME}
+                        docker rm ${APP_NAME}
                     fi
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    sudo docker run -d --name ${APP_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
                     '''
                 }
             }
@@ -88,4 +76,5 @@ pipeline {
         failure {
             echo 'Build or Deployment failed.'
         }
-   
+    }
+}
