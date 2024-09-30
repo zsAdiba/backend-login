@@ -1,18 +1,30 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:19.03'  // Use Docker image to enable Docker inside the pipeline
-            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket for Docker commands
-        }
-    }
+    agent any
 
     environment {
         APP_NAME = 'flask-login-app'
-        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
-        DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
+        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'
+        DEPLOY_DIR = '/var/www/flask-login-app'
     }
 
     stages {
+        stage('Check and Install Python 3') {
+            steps {
+                script {
+                    def pythonInstalled = sh(script: 'which python3', returnStatus: true) == 0
+                    if (!pythonInstalled) {
+                        echo "Python 3 not found. Installing..."
+                        sh '''
+                        sudo apt-get update
+                        sudo apt-get install -y python3 python3-pip python3-venv
+                        '''
+                    } else {
+                        echo "Python 3 is already installed."
+                    }
+                }
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/zsAdiba/backend-login.git'
@@ -20,17 +32,10 @@ pipeline {
         }
 
         stage('Set up Python Environment') {
-            agent {
-                docker {
-                    image 'python:3.9-slim'  // Use Python Docker image for dependencies
-                    args '-v jenkins_home:/var/lib/docker/volumes/jenkins_home/_data'
-                }
-            }
             steps {
                 script {
-                    // Set up virtual environment and install dependencies
                     sh '''
-                    python -m venv venv
+                    python3 -m venv venv
                     . venv/bin/activate
                     pip install -r requirements.txt
                     '''
@@ -49,9 +54,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh '''
-                    sudo docker build -t ${IMAGE_NAME}:latest .
-                    '''
+                    sh 'docker build -t ${IMAGE_NAME}:latest .'
                 }
             }
         }
@@ -59,18 +62,16 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Stop and remove existing container if it exists
                     sh '''
                     if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
                         echo "Stopping existing container ${APP_NAME}..."
-                        sudo docker stop ${APP_NAME}
+                        docker stop ${APP_NAME}
                         echo "Removing existing container ${APP_NAME}..."
-                        sudo docker rm ${APP_NAME}
+                        docker rm ${APP_NAME}
                     fi
 
-                    // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    sudo docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
                     '''
                 }
             }
