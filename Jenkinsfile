@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker:latest'  // Use Docker image to enable Docker inside the pipeline
+            image 'docker:19.03'  // Use Docker image to enable Docker inside the pipeline
             args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket for Docker commands
         }
     }
