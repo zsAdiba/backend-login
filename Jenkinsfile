@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any  // Use any available agent
 
     environment {
         APP_NAME = 'flask-login-app'
@@ -8,23 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Check and Install Python 3') {
-            steps {
-                script {
-                    def pythonInstalled = sh(script: 'which python3', returnStatus: true) == 0
-                    if (!pythonInstalled) {
-                        echo "Python 3 not found. Installing..."
-                        sh '''
-                        sudo apt-get update
-                        sudo apt-get install -y python3 python3-pip python3-venv
-                        '''
-                    } else {
-                        echo "Python 3 is already installed."
-                    }
-                }
-            }
-        }
-
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/zsAdiba/backend-login.git'
@@ -34,6 +17,7 @@ pipeline {
         stage('Set up Python Environment') {
             steps {
                 script {
+                    // Set up virtual environment and install dependencies
                     sh '''
                     python3 -m venv venv
                     . venv/bin/activate
@@ -62,6 +46,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    // Stop and remove existing container if it exists
                     sh '''
                     if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
                         echo "Stopping existing container ${APP_NAME}..."
@@ -70,6 +55,7 @@ pipeline {
                         docker rm ${APP_NAME}
                     fi
 
+                    # Run the new container
                     echo "Deploying new container ${APP_NAME}..."
                     docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
                     '''
