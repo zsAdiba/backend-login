@@ -1,14 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.9-slim'  // Use the Python Docker image for the pipeline
-            args '-v jenkins_home:/var/lib/docker/volumes/jenkins_home/_data'
-        }
-    }
+    agent any
 
     environment {
         APP_NAME = 'flask-login-app'
-        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
+        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}' // Replace with your Docker Hub username or appropriate image name
         DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
     }
 
@@ -20,26 +15,11 @@ pipeline {
             }
         }
 
-        stage('Set up Virtual Environment') {
-            steps {
-                script {
-                    // Create a virtual environment and activate it
-                    sh '''
-                    python -m venv venv
-                    . venv/bin/activate
-                    '''
-                }
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 script {
                     // Install Python dependencies from requirements.txt
-                    sh '''
-                    . venv/bin/activate
-                    pip install -r requirements.txt
-                    '''
+                    sh 'pip install --user -r requirements.txt'
                 }
             }
         }
@@ -47,7 +27,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // This step can be customized if you have unit tests for your Python app
+                    // Placeholder for tests
                     echo 'Tests passed!'
                 }
             }
@@ -78,7 +58,7 @@ pipeline {
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
                     '''
                 }
             }
