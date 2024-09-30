@@ -72,7 +72,7 @@ pipeline {
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 80:5000 ${IMAGE_NAME}:latest
                     '''
                 }
             }
