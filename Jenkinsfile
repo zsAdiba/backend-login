@@ -1,30 +1,39 @@
 pipeline {
     agent {
         docker {
-            image 'docker:19.03.12' // Replace with a version that supports Docker-in-Docker
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+            image 'docker:latest'  // Use Docker image to enable Docker inside the pipeline
+            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket for Docker commands
         }
     }
 
     environment {
         APP_NAME = 'flask-login-app'
-        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}' // Replace with your Docker Hub username or appropriate image name
+        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
         DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the Git repository from the remote URL
                 git branch: 'main', url: 'https://github.com/zsAdiba/backend-login.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Set up Python Environment') {
+            agent {
+                docker {
+                    image 'python:3.9-slim'  // Use Python Docker image for dependencies
+                    args '-v jenkins_home:/var/lib/docker/volumes/jenkins_home/_data'
+                }
+            }
             steps {
                 script {
-                    // Install Python dependencies from requirements.txt
-                    sh 'pip install --user -r requirements.txt'
+                    // Set up virtual environment and install dependencies
+                    sh '''
+                    python -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
                 }
             }
         }
@@ -32,7 +41,6 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Placeholder for tests
                     echo 'Tests passed!'
                 }
             }
@@ -41,7 +49,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
                     sh '''
                     docker build -t ${IMAGE_NAME}:latest .
                     '''
@@ -63,7 +70,7 @@ pipeline {
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
                     '''
                 }
             }
@@ -72,7 +79,6 @@ pipeline {
 
     post {
         always {
-            // Clean up workspace after build
             cleanWs()
         }
         success {
