@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    docker build -t ${IMAGE_NAME}:latest .
+                    sudo docker build -t ${IMAGE_NAME}:latest .
                     '''
                 }
             }
@@ -63,14 +63,14 @@ pipeline {
                     sh '''
                     if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
                         echo "Stopping existing container ${APP_NAME}..."
-                        docker stop ${APP_NAME}
+                        sudo docker stop ${APP_NAME}
                         echo "Removing existing container ${APP_NAME}..."
-                        docker rm ${APP_NAME}
+                        sudo docker rm ${APP_NAME}
                     fi
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
+                    sudo docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
                     '''
                 }
             }
