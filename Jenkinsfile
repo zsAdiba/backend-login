@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         APP_NAME = 'flask-login-app'
-        IMAGE_NAME = 'root.ccsd.com/${APP_NAME}'  // Replace with your Docker Hub username or appropriate image name
+        IMAGE_NAME = 'flask-login-app-image'  // Replace with your Docker Hub username or appropriate image name
         DEPLOY_DIR = '/var/www/flask-login-app'  // Directory to deploy the app (if needed)
         DOCKER_CONFIG = '/root/.docker'  // Use a writable directory for Docker config
     }
@@ -23,7 +23,7 @@ pipeline {
         stage('Set up Python Environment') {
             agent {
                 docker {
-                    image 'python:3.9-slim'  // Use Python Docker image for dependencies
+                    image 'python'  // Use Python Docker image for dependencies
                     args '-v jenkins_home:/var/lib/docker/volumes/jenkins_home/_data'
                 }
             }
