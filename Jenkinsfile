@@ -61,16 +61,21 @@ pipeline {
                 script {
                     // Stop and remove existing container if it exists
                     sh '''
-                    if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
-                        echo "Stopping existing container ${APP_NAME}..."
-                        docker stop ${APP_NAME}
-                        echo "Removing existing container ${APP_NAME}..."
-                        docker rm ${APP_NAME}
-                    fi
+                        TEMP_CONFIG_DIR=$(mktemp -d)
+                        export DOCKER_CONFIG=$TEMP_CONFIG_DIR
+                        echo "Using Docker config directory: $DOCKER_CONFIG"
 
-                    // Run the new container
-                    echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 80:5000 ${IMAGE_NAME}:latest
+                        // Stop and remove existing container if it exists
+                        if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
+                            echo "Stopping existing container ${APP_NAME}..."
+                            docker stop ${APP_NAME}
+                            echo "Removing existing container ${APP_NAME}..."
+                            docker rm ${APP_NAME}
+                        fi
+
+                        // Run the new container
+                        echo "Deploying new container ${APP_NAME}..."
+                        docker run -d --name ${APP_NAME} -p 80:5000 ${IMAGE_NAME}:latest
                     '''
                 }
             }
