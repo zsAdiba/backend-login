@@ -51,7 +51,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image using the writable Docker config directory
-                    sh 'DOCKER_CONFIG=$(mktemp -d) docker build -t ${IMAGE_NAME}:latest .
+                    sh 'DOCKER_CONFIG=$(mktemp -d) docker build -t ${IMAGE_NAME}:latest .'
                 }
             }
         }
