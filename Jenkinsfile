@@ -52,7 +52,7 @@ pipeline {
                 script {
                     // Build the Docker image using the writable Docker config directory
                     sh '''
-                    docker build -t ${IMAGE_NAME}:latest .
+                    docker --config /dev/null build -t ${IMAGE_NAME}:latest .
                     '''
                 }
             }
