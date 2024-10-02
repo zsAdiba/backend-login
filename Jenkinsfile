@@ -51,11 +51,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image using the writable Docker config directory
-                    sh '''
-                        TEMP_CONFIG_DIR=$(mktemp -d)
-                        export DOCKER_CONFIG=$TEMP_CONFIG_DIR
-                        docker build -t ${IMAGE_NAME}:latest .
-                    '''
+                    sh 'DOCKER_CONFIG=$(mktemp -d) docker build -t ${IMAGE_NAME}:latest .
                 }
             }
         }
@@ -74,7 +70,7 @@ pipeline {
 
                     // Run the new container
                     echo "Deploying new container ${APP_NAME}..."
-                    docker run -d --name ${APP_NAME} -p 80:80 ${IMAGE_NAME}:latest
+                    docker run -d --name ${APP_NAME} -p 80:5000 ${IMAGE_NAME}:latest
                     '''
                 }
             }
