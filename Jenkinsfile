@@ -59,13 +59,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Stop and remove existing container if it exists
+                    // Create a temporary directory for Docker config for deployment
                     sh '''
                         TEMP_CONFIG_DIR=$(mktemp -d)
                         export DOCKER_CONFIG=$TEMP_CONFIG_DIR
                         echo "Using Docker config directory: $DOCKER_CONFIG"
 
-                        // Stop and remove existing container if it exists
+                        # Stop and remove existing container if it exists
                         if [ "$(docker ps -q -f name=${APP_NAME})" ]; then
                             echo "Stopping existing container ${APP_NAME}..."
                             docker stop ${APP_NAME}
@@ -73,7 +73,7 @@ pipeline {
                             docker rm ${APP_NAME}
                         fi
 
-                        // Run the new container
+                        # Run the new container
                         echo "Deploying new container ${APP_NAME}..."
                         docker run -d --name ${APP_NAME} -p 80:5000 ${IMAGE_NAME}:latest
                     '''
